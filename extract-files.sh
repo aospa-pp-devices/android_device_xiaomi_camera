@@ -56,7 +56,7 @@ function blob_fixup() {
     case "${1}" in
         system/lib64/libgui-xiaomi.so)
             [ "$2" = "" ] && return 0
-            sed -i "s/android.hardware.graphics.common-V4-ndk.so/android.hardware.graphics.common-V5-ndk.so/" "${2}"
+            sed -i "s/android.hardware.graphics.common-V6-ndk.so/android.hardware.graphics.common-V7-ndk.so/" "${2}"
             ;;
         system/lib64/libcamera_algoup_jni.xiaomi.so|system/lib64/libcamera_mianode_jni.xiaomi.so)
             [ "$2" = "" ] && return 0
