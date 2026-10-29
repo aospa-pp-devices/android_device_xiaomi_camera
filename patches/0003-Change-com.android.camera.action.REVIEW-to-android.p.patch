@@ -1,46 +1,36 @@
-From 009d04c6e0a5010f8553cf4672d8eb6e8b4474fb Mon Sep 17 00:00:00 2001
-From: Arian <arian.kulmer@web.de>
-Date: Wed, 16 Oct 2024 01:29:58 +0200
-Subject: [PATCH 3/7] Change com.android.camera.action.REVIEW to
+From a59934d38d95aa90b76cce7ff3845f98a799d005 Mon Sep 17 00:00:00 2001
+From: Arian <arian@kulmer.hu>
+Date: Sat, 31 Oct 2026 17:27:06 +0800
+Subject: Change com.android.camera.action.REVIEW to
  android.provider.action.REVIEW
 
 This is the standard intent for review actions
 ---
-diff --git a/smali/d/c/a/a4.smali b/smali/d/c/a/a4.smali
-index f33fe59c..21303c1a 100644
---- a/smali/d/c/a/a4.smali
-+++ b/smali/d/c/a/a4.smali
-@@ -885,7 +885,7 @@
+ smali/A/c3.smali | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/smali/A/c3.smali b/smali/A/c3.smali
+index 0499239a..b57090b1 100644
+--- a/smali/A/c3.smali
++++ b/smali/A/c3.smali
+@@ -85,7 +85,7 @@
  
-     move-result p0
+     const/4 v4, 0x0
  
--    const-string v0, "com.android.camera.action.REVIEW"
-+    const-string v0, "android.provider.action.REVIEW"
+-    const-string v5, "com.android.camera.action.REVIEW"
++    const-string v5, "android.provider.action.REVIEW"
  
-     if-eqz p0, :cond_0
+     if-eqz v1, :cond_0
  
-@@ -954,7 +954,7 @@
+@@ -129,7 +129,7 @@
+     :cond_1
+     new-array v1, v4, [Ljava/lang/Object;
  
-     const-string p1, "GalleryHelper"
+-    const-string v6, "gotoGallery: com.android.camera.action.REVIEW"
++    const-string v6, "gotoGallery: android.provider.action.REVIEW"
  
--    const-string v1, "gotoGallery: com.android.camera.action.REVIEW"
-+    const-string v1, "gotoGallery: android.provider.action.REVIEW"
- 
-     .line 10
-     invoke-static {p1, v1, p0}, Lcom/android/camera/log/Log;->d(Ljava/lang/String;Ljava/lang/String;[Ljava/lang/Object;)V
-diff --git a/smali/d/c/a/i5.smali b/smali/d/c/a/i5.smali
-index 127dfad5..a09cd9fb 100644
---- a/smali/d/c/a/i5.smali
-+++ b/smali/d/c/a/i5.smali
-@@ -179,7 +179,7 @@
- 
- .field private static d1:Landroid/view/accessibility/AccessibilityManager; = null
- 
--.field public static final e:Ljava/lang/String; = "com.android.camera.action.REVIEW"
-+.field public static final e:Ljava/lang/String; = "android.provider.action.REVIEW"
- 
- .field public static final e0:I = 0x8c37
+     invoke-static {v3, v6, v1}, Lcom/android/camera/log/Log;->d(Ljava/lang/String;Ljava/lang/String;[Ljava/lang/Object;)V
  
 -- 
-2.34.1
+2.43.0
 

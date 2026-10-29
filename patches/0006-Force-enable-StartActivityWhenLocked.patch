@@ -1,61 +1,73 @@
-From 1bb305aa5d2252b594932702af31e3d714d7ebeb Mon Sep 17 00:00:00 2001
-From: Arian <arian.kulmer@web.de>
-Date: Tue, 15 Oct 2024 19:06:16 +0200
-Subject: [PATCH 6/7] Force enable StartActivityWhenLocked
+From af4f1c9c6f7aad47a03a70b2c4a65feb5405569e Mon Sep 17 00:00:00 2001
+From: Arian <arian@kulmer.hu>
+Date: Sat, 31 Oct 2026 17:27:36 +0800
+Subject: [PATCH] Force enable StartActivityWhenLocked
 
 MIUI sends this with the intent, but on AOSP we don't get this parameter
 ---
-diff --git a/smali/d/c/a/k3.smali b/smali/d/c/a/k3.smali
-index 50f7f1d4..98015ee7 100644
---- a/smali/d/c/a/k3.smali
-+++ b/smali/d/c/a/k3.smali
-@@ -312,59 +312,11 @@
+ smali_classes4/jc/f.smali | 63 ++-------------------------------------
+ 1 file changed, 3 insertions(+), 60 deletions(-)
+
+diff --git a/smali_classes4/jc/f.smali b/smali_classes4/jc/f.smali
+index 8bba714b..27b89a97 100644
+--- a/smali_classes4/jc/f.smali
++++ b/smali_classes4/jc/f.smali
+@@ -304,68 +304,11 @@
  .end method
  
- .method public static K(Landroid/content/Intent;)Z
+ .method public static r(Landroid/content/Intent;)Z
 -    .locals 3
--    .annotation system Ldalvik/annotation/MethodParameters;
--        accessFlags = {
--            0x0
--        }
--        names = {
--            "intent"
--        }
--    .end annotation
 -
 -    const/4 v0, 0x0
 -
--    if-eqz p0, :cond_0
+-    if-eqz p0, :cond_1
 -
 -    const-string v1, "StartActivityWhenLocked"
 -
--    .line 1
 -    invoke-virtual {p0, v1, v0}, Landroid/content/Intent;->getBooleanExtra(Ljava/lang/String;Z)Z
+-
+-    move-result v1
+-
+-    if-nez v1, :cond_0
+-
+-    const-string v1, "from_keyguard_shortcut"
+-
+-    invoke-virtual {p0, v1, v0}, Landroid/content/Intent;->getBooleanExtra(Ljava/lang/String;Z)Z
+-
+-    move-result v1
+-
+-    if-nez v1, :cond_0
+-
+-    const-string v1, "android.media.action.STILL_IMAGE_CAMERA_SECURE"
+-
+-    invoke-virtual {p0}, Landroid/content/Intent;->getAction()Ljava/lang/String;
+-
+-    move-result-object v2
+-
+-    invoke-virtual {v1, v2}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
+-
+-    move-result v1
+-
+-    if-nez v1, :cond_0
+-
+-    invoke-static {p0}, Ljc/f;->p(Landroid/content/Intent;)Z
 -
 -    move-result p0
 -
--    if-eqz p0, :cond_0
+-    if-eqz p0, :cond_1
 -
+-    :cond_0
 -    const/4 p0, 0x1
 -
 -    goto :goto_0
 -
--    :cond_0
+-    :cond_1
 -    move p0, v0
 -
--    .line 2
 -    :goto_0
--    new-instance v1, Ljava/lang/StringBuilder;
+-    const-string v1, "start activity when locked: "
 -
--    invoke-direct {v1}, Ljava/lang/StringBuilder;-><init>()V
--
--    const-string v2, "start activity when locked: "
--
--    invoke-virtual {v1, v2}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
--
--    invoke-virtual {v1, p0}, Ljava/lang/StringBuilder;->append(Z)Ljava/lang/StringBuilder;
--
--    invoke-virtual {v1}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
+-    invoke-static {v1, p0}, LA/P;->f(Ljava/lang/String;Z)Ljava/lang/String;
 -
 -    move-result-object v1
 -
@@ -71,7 +83,7 @@ index 50f7f1d4..98015ee7 100644
 +    return v0
  .end method
  
- .method public static M(Landroid/content/Intent;)Z
+ .method public static s(Landroid/content/Intent;)Z
 -- 
-2.34.1
+2.43.0
 
