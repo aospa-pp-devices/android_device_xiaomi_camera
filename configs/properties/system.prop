@@ -4,6 +4,19 @@ ro.com.google.lens.oem_camera_package=com.android.camera
 ro.hardware.camera=xiaomi
 ro.miui.build.region=global
 ro.miui.notch=1
+
+# HyperOS version identifiers. The MIUI camera checks these (via Gg.s.k) to
+# decide whether to enumerate vendor tags with getAllVendorKeys() instead of
+# the AOSP getAvailableCaptureRequestKeys(), which no longer carries vendor
+# keys on Android 17. Without them its vendor tag set is empty, the beauty
+# version is read as 2 and FragmentBeauty crashes on the 3D beauty tab.
+ro.mi.os.version.publish=true
+ro.mi.os.version.code=3
+ro.mi.os.version.name=OS3.0
+ro.mi.os.version.incremental=OS3.0.303.0.WMCMIXM
+ro.miui.ui.version.code=816
+ro.miui.ui.version.name=V816
+
 vendor.camera.aux.packagelist=org.codeaurora.snapcam,com.android.camera
 
 import /system/etc/build_camera_${ro.boot.hardware.sku}.prop
