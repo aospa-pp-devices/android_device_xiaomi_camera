@@ -2,55 +2,69 @@ From: Arian <arian@kulmer.hu>
 Subject: Handle the Android 17 CaptureResultExtras constructor
 
 toTotalCaptureResult() reflects on the hidden CaptureResultExtras
-constructor to translate the MIUI custom result. Android 17 added
+constructor to translate the MIUI custom result.  Android 17 added
 lastCompletedRegularFrameNumber, lastCompletedReprocessFrameNumber,
 lastCompletedZslFrameNumber, hasReadoutTimestamp and
 readoutTimestamp (13 params), so both the 11-param and the 8-param
 lookups failed and the VirtualCameraReprocessor stalled, leaving the
 shot pending forever.
 
-Extend the first lookup to the 13-param constructor and fill the new
-fields with their neutral values (0 / false).
+Extend the first lookup to the 13-param constructor, fill the new
+fields with their neutral values (0 / false), pass the last-completed
+frame numbers as Longs and keep the wide constants in registers that
+are not array indexes in the fallback path, so the class still
+verifies.
 
 ---
-diff --git a/smali_classes3/com/xiaomi/protocol/ICustomCaptureResult.smali b/smali_classes3/com/xiaomi/protocol/ICustomCaptureResult.smali
-index 6406b1ed..54faec57 100644
---- a/smali_classes3/com/xiaomi/protocol/ICustomCaptureResult.smali
-+++ b/smali_classes3/com/xiaomi/protocol/ICustomCaptureResult.smali
-@@ -509,7 +509,7 @@
+     .annotation system Ldalvik/annotation/MethodParameters;
+         accessFlags = {
+             0x0,
+@@ -608,35 +608,24 @@
  
-     if-lt v1, v8, :cond_0
+     aput-object v16, v1, v11
  
--    const/16 v1, 0xb
-+    const/16 v1, 0xd
- 
-     :try_start_1
-     new-array v8, v1, [Ljava/lang/Class;
-@@ -546,6 +546,12 @@
-     const/16 v21, 0xa
- 
-     aput-object v20, v8, v21
-+    sget-object v18, Ljava/lang/Boolean;->TYPE:Ljava/lang/Class;
-+    const/16 v19, 0xb
-+    aput-object v18, v8, v19
-+    sget-object v18, Ljava/lang/Long;->TYPE:Ljava/lang/Class;
+-    const/16 v20, -0x1
+-
+-    invoke-static/range {v20 .. v20}, Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;
+-
++    const-wide/16 v23, -0x1
++    invoke-static/range {v23 .. v24}, Ljava/lang/Long;->valueOf(J)Ljava/lang/Long;
+     move-result-object v22
+-
+     const/16 v18, 0x8
+-
+     aput-object v22, v1, v18
+-
+-    invoke-static/range {v20 .. v20}, Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;
+-
+-    move-result-object v22
+-
++    const/16 v19, 0x9
+     aput-object v22, v1, v19
+-
+-    invoke-static/range {v20 .. v20}, Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;
+-
+-    move-result-object v19
+-
+-    aput-object v19, v1, v21
++    const/16 v21, 0xa
++    aput-object v22, v1, v21
+     const/16 v18, 0xb
+-    sget-object v19, Ljava/lang/Boolean;->FALSE:Ljava/lang/Boolean;
+-    aput-object v19, v1, v18
+-    const-wide/16 v19, 0x0
+-    invoke-static/range {v19 .. v20}, Ljava/lang/Long;->valueOf(J)Ljava/lang/Long;
+-    move-result-object v19
+-    const/16 v18, 0xc
+-    aput-object v19, v1, v18
++    sget-object v20, Ljava/lang/Boolean;->FALSE:Ljava/lang/Boolean;
++    aput-object v20, v1, v18
++    const-wide/16 v23, 0x0
++    invoke-static/range {v23 .. v24}, Ljava/lang/Long;->valueOf(J)Ljava/lang/Long;
++    move-result-object v20
 +    const/16 v19, 0xc
-+    aput-object v18, v8, v19
- 
-     .line 7
-     invoke-virtual {v7, v8}, Ljava/lang/Class;->getDeclaredConstructor([Ljava/lang/Class;)Ljava/lang/reflect/Constructor;
-@@ -623,6 +629,14 @@
-     move-result-object v19
- 
-     aput-object v19, v1, v21
-+    const/16 v18, 0xb
-+    sget-object v19, Ljava/lang/Boolean;->FALSE:Ljava/lang/Boolean;
-+    aput-object v19, v1, v18
-+    const-wide/16 v19, 0x0
-+    invoke-static/range {v19 .. v20}, Ljava/lang/Long;->valueOf(J)Ljava/lang/Long;
-+    move-result-object v19
-+    const/16 v18, 0xc
-+    aput-object v19, v1, v18
++    aput-object v20, v1, v19
++
  
      .line 10
      invoke-virtual {v8, v1}, Ljava/lang/reflect/Constructor;->newInstance([Ljava/lang/Object;)Ljava/lang/Object;
