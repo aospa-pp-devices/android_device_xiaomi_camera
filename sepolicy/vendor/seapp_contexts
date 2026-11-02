@@ -1,0 +1,5 @@
+# MIUI camera: keep it in the classic platform_app domain instead of
+# platform_app_36 so the vendor sepolicy rules in this directory
+# (hwbinder_use, the camerapostproc hwservice, the camera HAL binder
+# calls and the vendor properties) apply to it.
+user=_app isPrivApp=true seinfo=platform name=com.android.camera domain=platform_app type=app_data_file levelFrom=user

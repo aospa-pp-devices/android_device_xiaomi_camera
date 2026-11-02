@@ -1,0 +1,35 @@
+From: Arian <arian@kulmer.hu>
+Subject: Write and publish parallel shots directly
+
+For parallel captures the save path skips both the direct write and
+the IS_PENDING reset and expects the MIUI gallery (com.miui.gallery)
+to pull the bytes through ParallelProcessProvider and publish the
+item later. Without that gallery installed, shots stay pending until
+the next camera start recovers them.
+
+Make the never-taken-branch trick explicit: run the direct write and
+the publish update for parallel shots too.
+
+---
+diff --git a/smali_classes2/d/c/a/f7/y.smali b/smali_classes2/d/c/a/f7/y.smali
+index 8c807c0f..6ffa90df 100644
+--- a/smali_classes2/d/c/a/f7/y.smali
++++ b/smali_classes2/d/c/a/f7/y.smali
+@@ -3394,7 +3394,7 @@
+ 
+     if-lt v2, v3, :cond_7
+ 
+-    if-nez p10, :cond_6
++    if-ltz p10, :cond_6
+ 
+     goto :goto_3
+ 
+@@ -3461,7 +3461,7 @@
+ 
+     if-lt v0, v3, :cond_9
+ 
+-    if-nez p10, :cond_a
++    if-ltz p10, :cond_a
+ 
+     .line 23
+     :cond_9

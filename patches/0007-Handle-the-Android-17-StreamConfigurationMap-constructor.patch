@@ -1,0 +1,76 @@
+From: Arian <arian@kulmer.hu>
+Subject: Handle the Android 17 StreamConfigurationMap constructor
+
+The app builds custom StreamConfigurationMaps from the xiaomi.scaler.*
+vendor tags by reflecting on the hidden StreamConfigurationMap
+constructor. On Android 17 that constructor gained the heicUltraHDR
+group and the enforceImplementationDefined flag (22 params), so the
+lookup fails with NoSuchMethodException, the map comes back null and
+module init aborts with "The supported picture size list return from
+hal is null!", which makes the exit-hint dialog close the camera a
+few seconds after opening.
+
+Since the 22-param constructor is public on Android 17, invoke it
+directly with nulls for the unknown groups and keep the legacy
+reflection path for older SDK levels.
+
+---
+diff --git a/smali_classes3/d/l/i/b/c.smali b/smali_classes3/d/l/i/b/c.smali
+index 12988e3d..e9256982 100644
+--- a/smali_classes3/d/l/i/b/c.smali
++++ b/smali_classes3/d/l/i/b/c.smali
+@@ -49,6 +49,54 @@
+ .end method
+ 
+ .method public static b([Landroid/hardware/camera2/params/StreamConfiguration;[Landroid/hardware/camera2/params/StreamConfigurationDuration;[Landroid/hardware/camera2/params/StreamConfigurationDuration;[Landroid/hardware/camera2/params/StreamConfiguration;[Landroid/hardware/camera2/params/StreamConfigurationDuration;[Landroid/hardware/camera2/params/StreamConfigurationDuration;[Landroid/hardware/camera2/params/StreamConfiguration;[Landroid/hardware/camera2/params/StreamConfigurationDuration;[Landroid/hardware/camera2/params/StreamConfigurationDuration;[Landroid/hardware/camera2/params/StreamConfiguration;[Landroid/hardware/camera2/params/StreamConfigurationDuration;[Landroid/hardware/camera2/params/StreamConfigurationDuration;[Landroid/hardware/camera2/params/HighSpeedVideoConfiguration;Landroid/hardware/camera2/params/ReprocessFormatsMap;Z)Landroid/hardware/camera2/params/StreamConfigurationMap;
++    .locals 24
++
++    # Android 17 (SDK > 33): the hidden StreamConfigurationMap constructor gained the
++    # heicUltraHDR group and the enforceImplementationDefined flag (22 params). Build the
++    # map directly with the vendor-tag data; groups the old app does not know about are
++    # passed as null, which the constructor accepts.
++    sget v0, Landroid/os/Build$VERSION;->SDK_INT:I
++    const/16 v1, 0x21
++    if-le v0, v1, :goto_legacy
++
++    new-instance v0, Landroid/hardware/camera2/params/StreamConfigurationMap;
++
++    move-object/from16 v1, p0
++    move-object/from16 v2, p1
++    move-object/from16 v3, p2
++    move-object/from16 v4, p3
++    move-object/from16 v5, p4
++    move-object/from16 v6, p5
++    move-object/from16 v7, p6
++    move-object/from16 v8, p7
++    move-object/from16 v9, p8
++    move-object/from16 v10, p9
++    move-object/from16 v11, p10
++    move-object/from16 v12, p11
++    const/16 v13, 0x0
++    const/16 v14, 0x0
++    const/16 v15, 0x0
++    const/16 v16, 0x0
++    const/16 v17, 0x0
++    const/16 v18, 0x0
++    move-object/from16 v19, p12
++    move-object/from16 v20, p13
++    move/from16 v21, p14
++    const/16 v22, 0x0
++
++    invoke-direct/range {v0 .. v22}, Landroid/hardware/camera2/params/StreamConfigurationMap;-><init>([Landroid/hardware/camera2/params/StreamConfiguration;[Landroid/hardware/camera2/params/StreamConfigurationDuration;[Landroid/hardware/camera2/params/StreamConfigurationDuration;[Landroid/hardware/camera2/params/StreamConfiguration;[Landroid/hardware/camera2/params/StreamConfigurationDuration;[Landroid/hardware/camera2/params/StreamConfigurationDuration;[Landroid/hardware/camera2/params/StreamConfiguration;[Landroid/hardware/camera2/params/StreamConfigurationDuration;[Landroid/hardware/camera2/params/StreamConfigurationDuration;[Landroid/hardware/camera2/params/StreamConfiguration;[Landroid/hardware/camera2/params/StreamConfigurationDuration;[Landroid/hardware/camera2/params/StreamConfigurationDuration;[Landroid/hardware/camera2/params/StreamConfiguration;[Landroid/hardware/camera2/params/StreamConfigurationDuration;[Landroid/hardware/camera2/params/StreamConfigurationDuration;[Landroid/hardware/camera2/params/StreamConfiguration;[Landroid/hardware/camera2/params/StreamConfigurationDuration;[Landroid/hardware/camera2/params/StreamConfigurationDuration;[Landroid/hardware/camera2/params/HighSpeedVideoConfiguration;Landroid/hardware/camera2/params/ReprocessFormatsMap;ZZ)V
++
++    return-object v0
++
++    :goto_legacy
++    invoke-static/range {p0 .. p14}, Ld/l/i/b/c;->b_orig([Landroid/hardware/camera2/params/StreamConfiguration;[Landroid/hardware/camera2/params/StreamConfigurationDuration;[Landroid/hardware/camera2/params/StreamConfigurationDuration;[Landroid/hardware/camera2/params/StreamConfiguration;[Landroid/hardware/camera2/params/StreamConfigurationDuration;[Landroid/hardware/camera2/params/StreamConfigurationDuration;[Landroid/hardware/camera2/params/StreamConfiguration;[Landroid/hardware/camera2/params/StreamConfigurationDuration;[Landroid/hardware/camera2/params/StreamConfigurationDuration;[Landroid/hardware/camera2/params/StreamConfiguration;[Landroid/hardware/camera2/params/StreamConfigurationDuration;[Landroid/hardware/camera2/params/StreamConfigurationDuration;[Landroid/hardware/camera2/params/HighSpeedVideoConfiguration;Landroid/hardware/camera2/params/ReprocessFormatsMap;Z)Landroid/hardware/camera2/params/StreamConfigurationMap;
++
++    move-result-object v0
++
++    return-object v0
++.end method
++
++.method public static b_orig([Landroid/hardware/camera2/params/StreamConfiguration;[Landroid/hardware/camera2/params/StreamConfigurationDuration;[Landroid/hardware/camera2/params/StreamConfigurationDuration;[Landroid/hardware/camera2/params/StreamConfiguration;[Landroid/hardware/camera2/params/StreamConfigurationDuration;[Landroid/hardware/camera2/params/StreamConfigurationDuration;[Landroid/hardware/camera2/params/StreamConfiguration;[Landroid/hardware/camera2/params/StreamConfigurationDuration;[Landroid/hardware/camera2/params/StreamConfigurationDuration;[Landroid/hardware/camera2/params/StreamConfiguration;[Landroid/hardware/camera2/params/StreamConfigurationDuration;[Landroid/hardware/camera2/params/StreamConfigurationDuration;[Landroid/hardware/camera2/params/HighSpeedVideoConfiguration;Landroid/hardware/camera2/params/ReprocessFormatsMap;Z)Landroid/hardware/camera2/params/StreamConfigurationMap;
+     .locals 23
+ 
+     const-string v1, "CameraConstructCompat"
